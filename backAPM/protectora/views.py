@@ -8,7 +8,6 @@ from django.http import JsonResponse;
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt 
 from django.utils.decorators import method_decorator
-from django.forms.models import model_to_dict
 from .models import Protectora
 from .protectoraService import ProtectoraService, AnimalService
 import asyncio
@@ -21,12 +20,16 @@ class Protecora(View):
     
     def get(self, request, id):
         protecora = ProtectoraService.getProtectora(id)
-        return JsonResponse(model_to_dict(protecora))
+        return JsonResponse(protecora, safe=False)
     
     def post(self, request):
         input = json.loads(request.body)
         protectora = ProtectoraService.createProtectora(input)
-        return JsonResponse(model_to_dict(protectora), safe=False)
+        return JsonResponse(protectora, safe=False)
+    
+    def delete(self, requset, id):
+        result = ProtectoraService.deleteProtectora(id)
+        return JsonResponse(result, safe=False)
     
 class Animal(View):
     @method_decorator(csrf_exempt)
@@ -35,9 +38,13 @@ class Animal(View):
     
     def get(self, request, id):
         animal = AnimalService.getAnimal(id)
-        return JsonResponse(model_to_dict(animal))
+        return JsonResponse(animal, safe=False)
     
     def post(self, request):
         input = json.loads(request.body)
         animal = AnimalService.registerAnimal(input)
-        return JsonResponse(model_to_dict(animal), safe=False)
+        return JsonResponse(animal, safe=False)
+    
+    def delete(self, requset, id):
+        result = AnimalService.deleteAnimal(id)
+        return JsonResponse(result, safe=False)
