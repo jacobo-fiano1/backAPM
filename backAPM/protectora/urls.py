@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin;
 from django.urls import path, include;
+from .views import *;
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('protectora.urls'))
+    path('protectora/<str:id>', Protecora.as_view(), name='Get protectora'),
+    path('protectora', Protecora.as_view(), name='Create Protectora'),
+    path('animal/<str:id>', Animal.as_view(), name='Get Animal'),
+    path('animal', Animal.as_view(), name='Register Animal')
 ]
