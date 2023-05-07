@@ -1,5 +1,8 @@
 from .models import Protectora, Animal
 from django.forms.models import model_to_dict
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
 import logging
 
 logger = logging.getLogger(__name__)
@@ -66,3 +69,15 @@ class AnimalService:
             return "OK: Animal " + id + " eliminada." 
         except:
             return "ERROR: Animal con ID: " + id + " no registrado"
+        
+class UserService:
+    
+    def createUser(input):
+        try:
+            user = User.objects.create_user(username=input["username"], password=input["pass"])
+            #user.user_permissions.add()
+            user.save()
+            logger.info("Registrado nueva protectora: " + user.first_name)
+            return model_to_dict(user)
+        except:
+            return "ERROR: Ya existe un usuario con ese login"

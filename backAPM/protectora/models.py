@@ -12,7 +12,7 @@ class Protectora(models.Model):
     url = models.CharField(max_length=200)
     correo = models.CharField(max_length=30)
     descripcion = models.CharField(max_length=500)
-    #imagenes = ArrayField(models.ImageField(), default=list)
+    #imagenes = models.ImageField(upload_to='protectoras/', blank=True)
     
     def __str__(self):
         return f"{self.name} {self.url}"

@@ -16,10 +16,14 @@ Including another URLconf
 from django.contrib import admin;
 from django.urls import path, include;
 from .views import *;
+from django.urls import path, include
+from rest_framework.authtoken import views
 
 urlpatterns = [
-    path('protectora/<str:id>', Protecora.as_view(), name='Get protectora'),
-    path('protectora', Protecora.as_view(), name='Create Protectora'),
+    path('login', Users.as_view(), name='Protecora log in'),
+    path('authenticate', views.obtain_auth_token, name='Protecora log in'),
     path('animal/<str:id>', Animal.as_view(), name='Get Animal'),
-    path('animal', Animal.as_view(), name='Register Animal')
+    path('animal', Animal.as_view(), name='Register Animal'),
+    path('<str:id>', Protecora.as_view(), name='Get protectora'),
+    path('', Protecora.as_view(), name='Create Protectora')
 ]
