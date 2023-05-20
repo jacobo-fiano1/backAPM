@@ -21,5 +21,8 @@ urlpatterns = [
     path('protectora/<str:id>', Protecora.as_view(), name='Get protectora'),
     path('protectora', Protecora.as_view(), name='Create Protectora'),
     path('animal/<str:id>', Animal.as_view(), name='Get Animal'),
-    path('animal', Animal.as_view(), name='Register Animal')
+    path('animal', Animal.as_view(), name='Register Animal'),
+    path('tweet/<str:id>', TwitterAPI.as_view(), name='Create a tweet'),
+    path('<str:id>', Protecora.as_view(), name='Get protectora'),
+    path('', Protecora.as_view(), name='Create Protectora')
 ]

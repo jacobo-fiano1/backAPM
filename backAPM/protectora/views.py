@@ -8,9 +8,12 @@ from django.http import JsonResponse;
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt 
 from django.utils.decorators import method_decorator
-from .models import Protectora
-from .protectoraService import ProtectoraService, AnimalService
-import asyncio
+from .protectoraService import ProtectoraService, AnimalService, UserService, TwitterService
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 # Create your views here.
 
 class Protecora(View):
@@ -48,3 +51,13 @@ class Animal(View):
     def delete(self, requset, id):
         result = AnimalService.deleteAnimal(id)
         return JsonResponse(result, safe=False)
+    
+class TwitterAPI(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request ,id):
+        protecora = ProtectoraService.getProtectora(id)
+        input = json.loads(request.body)
+        res = TwitterService.postTweet(protectora=protecora, data=input)
+        return JsonResponse(res, safe=False)
