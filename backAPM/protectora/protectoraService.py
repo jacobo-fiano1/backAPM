@@ -1,5 +1,8 @@
 from .models import Protectora, Animal
 from django.forms.models import model_to_dict
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
 import logging
 import requests
 from requests_oauthlib import OAuth1Session

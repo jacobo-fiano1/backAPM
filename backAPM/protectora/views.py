@@ -1,7 +1,6 @@
 import json
 from django.shortcuts import render
 from django.views import View
-import imp
 from unicodedata import name
 from django.shortcuts import render;
 from django.http import JsonResponse;
@@ -16,10 +15,9 @@ from rest_framework.views import APIView
 
 # Create your views here.
 
-class Protecora(View):
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+class Protecora(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request, id):
         protecora = ProtectoraService.getProtectora(id)
@@ -34,10 +32,19 @@ class Protecora(View):
         result = ProtectoraService.deleteProtectora(id)
         return JsonResponse(result, safe=False)
     
-class Animal(View):
+class Users(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
+    
+    def post(self, request):
+        input = json.loads(request.body)
+        user = UserService.createUser(input)
+        return JsonResponse(user, safe=False)
+    
+class Animal(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request, id):
         animal = AnimalService.getAnimal(id)
