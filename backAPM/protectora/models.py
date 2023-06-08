@@ -12,7 +12,11 @@ class Protectora(models.Model):
     url = models.CharField(max_length=200)
     correo = models.CharField(max_length=30)
     descripcion = models.CharField(max_length=500)
-    #imagenes = models.ImageField(upload_to='protectoras/', blank=True)
+    imagen = models.FileField(upload_to='protectoras/images/', blank='', default='')
+
+    class Meta:
+        managed = True
+        db_table = 'protectora_protectora'
     
     def __str__(self):
         return f"{self.name} {self.url}"
