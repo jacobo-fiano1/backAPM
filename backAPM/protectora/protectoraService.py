@@ -18,7 +18,6 @@ class ProtectoraService:
 
         protectora = Protectora.objects.get(pk=id)
         dict = model_to_dict(protectora, exclude=['imagen'])
-        print(str(protectora.imagen))
         dict["imagen"] = base64.b64encode(open("media/" + str(protectora.imagen), "rb").read()).decode('utf-8')
         
         return dict
@@ -50,11 +49,11 @@ class ProtectoraService:
 class AnimalService:
     
     def getAnimal(id):
-        try:
-            animal = Animal.objects.get(pk=id)
-            return model_to_dict(animal)
-        except:
-            return "ERROR: Animal con ID: " + id + " no encontrado."
+        animal = Animal.objects.get(pk=id)
+        dict = model_to_dict(animal, exclude=['imagen'])
+        dict["imagen"] = base64.b64encode(open("media/" + str(animal.imagen), "rb").read()).decode('utf-8')
+        return dict
+
                     
     def registerAnimal(data):
         try:
@@ -66,8 +65,15 @@ class AnimalService:
                 edad=data["edad"], estado=data["estado"], vacunas=data["vacunas"], descripcion=data["descripcion"],
                 protectora=protectora)
             animal.save()
+
+            format, imgstr = data["imagen"].split(';base64,')
+            ext = format.split('/')[-1]
+            data = ContentFile(base64.b64decode(imgstr))  
+            file_name = animal.name + "-" + str(animal.id) +"." + ext
+            animal.imagen.save(file_name, data, save=True)
+
             logger.info("OK: Registrado nuevo animal con ID: " +  str(animal.id) + " en Protectora " + str(animal.protectora.name))
-            return model_to_dict(animal)
+            return model_to_dict(animal, exclude=['imagen'])
         except:
             return "ERROR: Error al registrar el animal"
     

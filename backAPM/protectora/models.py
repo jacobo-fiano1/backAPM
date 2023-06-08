@@ -35,13 +35,17 @@ class Animal(models.Model):
     name = models.CharField(max_length=200)
     fechaNacimiento = models.DateField()
     descripcion = models.CharField(max_length=500)
-    #imagenes = ArrayField(models.BinaryField(), default=list)
+    imagen = models.FileField(upload_to='animals/images/', blank='', default='')
     tipo = models.CharField(max_length=50)
     edad = models.CharField(choices=Edad.choices, default=Edad.ADULTO, max_length=2)
     protectora = models.ForeignKey(Protectora, on_delete=models.DO_NOTHING)
     estado = models.CharField(choices=Estado.choices, default=Estado.DISPONIBLE, max_length=2)
     vacunas = ArrayField(models.CharField(max_length=200), default=list)
-    
+
+    class Meta:
+        managed = True
+        db_table = 'protectora_animal'
+
     def __str__(self):
         return f"{self.name}, {self.protectora}"
     
