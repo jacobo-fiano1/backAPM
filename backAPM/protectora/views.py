@@ -45,6 +45,16 @@ class Users(View):
         return JsonResponse(user, safe=False)
 
 
+class ProtectoraUsersInfo(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        username = request.GET["username"]
+        user = UserService.getProtectoraUser(username)
+        return JsonResponse(user, safe=False)
+
+
 class ProtectoraUsers(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

@@ -131,6 +131,21 @@ class UserService:
         logger.info("Registrado nueva usuario protectora: " + user.first_name)
         token, created = Token.objects.get_or_create(user=user)
         return {'token': token.key, 'IdProtectora': protectora["id"]}
+    
+    def getProtectoraUser(username):
+        users = User.objects.filter(username=username)
+
+        if len(users) != 1:
+            return "ERROR: No se encuentra al usuario"
+        
+        user = users[0]
+        token, created = Token.objects.get_or_create(user=user)
+
+        if user.is_staff == False:
+            return {'token': token.key, 'IdProtectora': None}
+        
+        return {'token': token.key, 'IdProtectora': user.first_name}
+
 
 class TwitterService:
 

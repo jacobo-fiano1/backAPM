@@ -22,6 +22,7 @@ from rest_framework.authtoken import views
 urlpatterns = [
     path('user/register', Users.as_view(), name='Protecora log in'),
     path('authenticate', views.obtain_auth_token, name='Protecora log in'),
+    path('protectora/info', ProtectoraUsersInfo.as_view(), name='Create Protectora'),
     path('animal/search', AnimalSearch.as_view(), name='Get Animal'),
     path('animal/tweet', TwitterAPI.as_view(), name='Publish tweet'),
     path('animal/<str:id>', Animal.as_view(), name='Get Animal'),
