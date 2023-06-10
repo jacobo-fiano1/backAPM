@@ -42,6 +42,17 @@ class Users(View):
         user = UserService.createUser(input)
         return JsonResponse(user, safe=False)
     
+    def get(self, request):
+        input = json.loads(request.body)
+        user = UserService.getUserProtectora(input)
+        return JsonResponse(user, safe=False)
+    
+    def post(self, request):
+        input = json.loads(request.body)
+        user = UserService.createProtectoraUser(input)
+        return JsonResponse(user, safe=False)
+    
+
 class Animal(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
