@@ -27,5 +27,6 @@ urlpatterns = [
     path('animal/<str:id>', Animal.as_view(), name='Get Animal'),
     path('animal', Animal.as_view(), name='Register Animal'),
     path('protectora/register', ProtectoraUsers.as_view(), name='Create Protectora'),
+    path('protectora/search', ProtectoraSearch.as_view(), name='Search protectoras'),
     path('protectora/<str:id>', Protecora.as_view(), name='Get protectora'),
 ]

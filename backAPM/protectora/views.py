@@ -90,6 +90,23 @@ class AnimalSearch(APIView):
         animal = AnimalService.searchAnimal(args)
         return JsonResponse(animal, safe=False)
     
+class ProtectoraSearch(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        args = {}
+
+        for arg in ["name", "ubicacion"]:
+            try:
+                args[arg] = request.GET[arg]
+            except:
+                continue
+
+        print("search protectora PARAMS: " + str(args) )
+        protectoras = ProtectoraService.searchProtectora(args)
+        return JsonResponse(protectoras, safe=False)
+    
 class TwitterAPI(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

@@ -13,6 +13,8 @@ class Protectora(models.Model):
     correo = models.CharField(max_length=30)
     descripcion = models.CharField(max_length=500)
     imagen = models.FileField(upload_to='protectoras/images/', blank='', default='')
+    latitud = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    longitud = models.DecimalField(max_digits=9, decimal_places=6, null=True)
 
     class Meta:
         managed = True

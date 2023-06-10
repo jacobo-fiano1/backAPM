@@ -24,7 +24,8 @@ class ProtectoraService:
 
     def createProtectora(data):
         protectora = Protectora(name = data["name"], direccion=data["direccion"], ubicacion=data["ubicacion"],
-            telefono=data["telefono"], url=data["url"], correo=data["correo"], descripcion=data["descripcion"])
+            telefono=data["telefono"], url=data["url"], correo=data["correo"], descripcion=data["descripcion"],
+            latitud=data["latitud"], longitud=data["longitud"])
         protectora.save()
 
         format, imgstr = data["imagen"].split(';base64,')
@@ -44,6 +45,16 @@ class ProtectoraService:
             return "OK: Protectora " + id + " eliminada." 
         except:
             return "ERROR: Protectora con ID: " + id + " no registrada"
+        
+    def searchProtectora(args):
+        protectoras = Protectora.objects.filter(**args)
+        data= []
+        for protectora in protectoras:
+            pDict = model_to_dict(protectora, exclude=['imagen']) 
+            pDict["imagen"] = base64.b64encode(open("media/" + str(protectora.imagen), "rb").read()).decode('utf-8')
+            data.append(pDict)
+
+        return{"data": data} 
    
         
 class AnimalService:
@@ -90,7 +101,9 @@ class AnimalService:
         animals = Animal.objects.filter(**args)
         data= []
         for animal in animals:
-            data.append(model_to_dict(animal))
+            aDict = model_to_dict(animal, exclude=['imagen']) 
+            aDict["imagen"] = base64.b64encode(open("media/" + str(animal.imagen), "rb").read()).decode('utf-8')
+            data.append(aDict)
 
         return{"data": data} 
         
