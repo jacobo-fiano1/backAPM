@@ -62,7 +62,7 @@ class AnimalService:
             return "ERROR: Protectora asociada no registrada"
         try:
             animal = Animal(name = data["name"], fechaNacimiento=data["fechaNacimiento"], tipo=data["tipo"],
-                edad=data["edad"], estado=data["estado"], vacunas=data["vacunas"], descripcion=data["descripcion"],
+                edad=data["edad"], estado=data["estado"], descripcion=data["descripcion"],
                 protectora=protectora)
             animal.save()
 

@@ -40,7 +40,6 @@ class Animal(models.Model):
     edad = models.CharField(choices=Edad.choices, default=Edad.ADULTO, max_length=2)
     protectora = models.ForeignKey(Protectora, on_delete=models.DO_NOTHING)
     estado = models.CharField(choices=Estado.choices, default=Estado.DISPONIBLE, max_length=2)
-    vacunas = ArrayField(models.CharField(max_length=200), default=list)
 
     class Meta:
         managed = True
