@@ -142,7 +142,7 @@ class UserService:
         token, created = Token.objects.get_or_create(user=user)
 
         if user.is_staff == False:
-            return {'token': token.key, 'IdProtectora': None}
+            return {'token': token.key, 'IdProtectora': 0}
         
         return {'token': token.key, 'IdProtectora': user.first_name}
 
