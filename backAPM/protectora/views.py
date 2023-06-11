@@ -45,13 +45,13 @@ class Users(View):
         return JsonResponse(user, safe=False)
 
 
-class ProtectoraUsersInfo(APIView):
+class UsersInfo(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         username = request.GET["username"]
-        user = UserService.getProtectoraUser(username)
+        user = UserService.getUserInfo(username)
         return JsonResponse(user, safe=False)
 
 
@@ -83,6 +83,32 @@ class Animal(APIView):
         result = AnimalService.deleteAnimal(id)
         return JsonResponse(result, safe=False)
     
+class AnimalFavs(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        idUser = request.GET["idUser"]
+        favs = AnimalService.getFavAnimals(idUser)
+        return JsonResponse(favs, safe=False)
+    
+    def post(self, request):
+        idUser = request.GET["idUser"]
+        idAnimal = request.GET["idAnimal"]
+        response = AnimalService.addFavAnimal(idUser, idAnimal)
+        return JsonResponse(response, safe=False)
+    
+class AnimalState(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        estado = request.GET["estado"]
+        idAnimal = request.GET["idAnimal"]
+        response = AnimalService.setAnimalEstate(idAnimal, estado)
+        return JsonResponse(response, safe=False)
+
+    
 class AnimalSearch(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -90,7 +116,7 @@ class AnimalSearch(APIView):
     def get(self, request):
         args = {}
 
-        for arg in ["tipo", "edad", "estado"]:
+        for arg in ["tipo", "edad", "estado", "protectora_id"]:
             try:
                 args[arg] = request.GET[arg]
             except:

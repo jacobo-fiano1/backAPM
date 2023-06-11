@@ -50,3 +50,11 @@ class Animal(models.Model):
     def __str__(self):
         return f"{self.name}, {self.protectora}"
     
+class UserFavs(models.Model):
+    idUsuario = models.IntegerField()
+    idsAnimalFav = ArrayField(models.IntegerField())
+
+    class Meta:
+        managed = True
+        db_table = 'user_animal_fav'
+    

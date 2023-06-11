@@ -1,5 +1,5 @@
 import json
-from .models import Protectora, Animal
+from .models import Protectora, Animal, UserFavs
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -23,9 +23,17 @@ class ProtectoraService:
         return dict
 
     def createProtectora(data):
+        latitud=0.0
+        longitud=0.0
+        try:
+            latitud=data["latitud"]
+            longitud=data["longitud"]
+        except:
+            print("Protectora sin Long y Lat")
+
         protectora = Protectora(name = data["name"], direccion=data["direccion"], ubicacion=data["ubicacion"],
             telefono=data["telefono"], url=data["url"], correo=data["correo"], descripcion=data["descripcion"],
-            latitud=data["latitud"], longitud=data["longitud"])
+            latitud=latitud, longitud=longitud)
         protectora.save()
 
         format, imgstr = data["imagen"].split(';base64,')
@@ -60,11 +68,13 @@ class ProtectoraService:
 class AnimalService:
     
     def getAnimal(id):
-        animal = Animal.objects.get(pk=id)
-        dict = model_to_dict(animal, exclude=['imagen'])
-        dict["imagen"] = base64.b64encode(open("media/" + str(animal.imagen), "rb").read()).decode('utf-8')
-        return dict
-
+        try:
+            animal = Animal.objects.get(pk=id)
+            dict = model_to_dict(animal, exclude=['imagen'])
+            dict["imagen"] = base64.b64encode(open("media/" + str(animal.imagen), "rb").read()).decode('utf-8')
+            return dict
+        except:
+            return "ERROR: Animal con id " +  id + " no registrado"
                     
     def registerAnimal(data):
         try:
@@ -105,7 +115,48 @@ class AnimalService:
             aDict["imagen"] = base64.b64encode(open("media/" + str(animal.imagen), "rb").read()).decode('utf-8')
             data.append(aDict)
 
-        return{"data": data} 
+        return{"data": data}
+    
+    def addFavAnimal(idUser, idAnimal):
+        AnimalService.getAnimal(idAnimal)
+        usersFavs = UserFavs.objects.filter(idUsuario=idUser)
+        if len(usersFavs) != 1:
+            return "ERROR: Favs del Usuario no encontrados"
+        
+        userFavs = usersFavs[0]
+        if int(idAnimal) in userFavs.idsAnimalFav:
+            return "ERROR: Animal con id " +  idAnimal + " ya está registrado en favs para este usuario."
+        
+        userFavs.idsAnimalFav.append(idAnimal)
+        userFavs.save()
+
+        return "OK: Animal con id " + idAnimal + " añadido a Favs"
+    
+    def getFavAnimals(idUsuario):
+        usersFavs = UserFavs.objects.filter(idUsuario=idUsuario)
+
+        if len(usersFavs) != 1:
+            return "ERROR: Favs del Usuario no encontrados"
+        
+        userFavs = usersFavs[0]
+
+        favs = []
+        for fav in userFavs.idsAnimalFav:
+            animal = AnimalService.getAnimal(fav)
+            favs.append(animal)
+
+        return {"data": favs}
+    
+    def setAnimalEstate(idAnimal, estado):
+        if estado not in ["AD", "RV", "DP"]:
+            return "ERROR: Estado incorrecto"
+        
+        animal = Animal.objects.get(pk=idAnimal)
+        animal.estado = estado
+        animal.save()
+        return "OK: Animal " + idAnimal + " registrado como : AD"
+
+
         
 
 class UserService:
@@ -114,10 +165,13 @@ class UserService:
         try:
             user = User.objects.create_user(username=input["username"], password=input["pass"], is_staff=False)
             user.save()
-            
+
+            favs = UserFavs(idUsuario=user.id, idsAnimalFav=[])
+            favs.save()
+
             logger.info("Registrado nueva protectora: " + user.first_name)
             token, created = Token.objects.get_or_create(user=user)
-            return {'token': token.key, 'IdProtectora': None}
+            return {'token': token.key, 'Id': user.id, "isProtectora": False}
         except:
             return "ERROR: Ya existe un usuario con ese login"
         
@@ -130,9 +184,9 @@ class UserService:
 
         logger.info("Registrado nueva usuario protectora: " + user.first_name)
         token, created = Token.objects.get_or_create(user=user)
-        return {'token': token.key, 'IdProtectora': protectora["id"]}
+        return {'token': token.key, 'Id': protectora["id"], "isProtectora": True}
     
-    def getProtectoraUser(username):
+    def getUserInfo(username):
         users = User.objects.filter(username=username)
 
         if len(users) != 1:
@@ -142,9 +196,9 @@ class UserService:
         token, created = Token.objects.get_or_create(user=user)
 
         if user.is_staff == False:
-            return {'token': token.key, 'IdProtectora': 0}
+            return {'token': token.key, 'Id': user.id, "isProtectora": False}
         
-        return {'token': token.key, 'IdProtectora': user.first_name}
+        return {'token': token.key, 'Id': user.first_name, "isProtectora": True}
 
 
 class TwitterService:
