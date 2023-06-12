@@ -129,12 +129,12 @@ class AnimalService:
         if int(idAnimal) in userFavs.idsAnimalFav:
             userFavs.idsAnimalFav.remove(int(idAnimal))
             userFavs.save()
-            return "OK: Animal con id " + idAnimal + " eliminado de  la lsita de favoritos"
+            return {"msg": "OK: Animal con id " + idAnimal + " eliminado de  la lsita de favoritos"}
         
         userFavs.idsAnimalFav.append(idAnimal)
         userFavs.save()
 
-        return "OK: Animal con id " + idAnimal + " añadido a Favs"
+        return {"msg": "OK: Animal con id " + idAnimal + " añadido a Favs"}
     
     def getFavAnimals(idUsuario):
         usersFavs = UserFavs.objects.filter(idUsuario=idUsuario)
