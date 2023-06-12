@@ -170,7 +170,7 @@ class AnimalService:
         animal = Animal.objects.get(pk=idAnimal)
         animal.estado = estado
         animal.save()
-        return "OK: Animal " + idAnimal + " registrado como : AD"
+        return {"msg": "OK: Animal " + idAnimal + " registrado como : AD"}
 
 
         
