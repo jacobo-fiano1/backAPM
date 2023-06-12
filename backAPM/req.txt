@@ -1,0 +1,5 @@
+psycopg2
+djangorestframework
+pillow
+drf-extra-fields
+requests_oauthlib

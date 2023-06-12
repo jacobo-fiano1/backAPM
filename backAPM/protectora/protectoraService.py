@@ -81,22 +81,24 @@ class AnimalService:
             protectora = Protectora.objects.get(pk=data["protectora"])
         except:
             return "ERROR: Protectora asociada no registrada"
-        try:
-            animal = Animal(name = data["name"], fechaNacimiento=data["fechaNacimiento"], tipo=data["tipo"],
-                edad=data["edad"], estado=data["estado"], descripcion=data["descripcion"],
-                protectora=protectora)
-            animal.save()
 
-            format, imgstr = data["imagen"].split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr))  
-            file_name = animal.name + "-" + str(animal.id) +"." + ext
-            animal.imagen.save(file_name, data, save=True)
+        animal = Animal(name = data["name"], fechaNacimiento=data["fechaNacimiento"], tipo=data["tipo"],
+            edad=data["edad"], estado=data["estado"], descripcion=data["descripcion"],
+            protectora=protectora)
+        animal.save()
 
-            logger.info("OK: Registrado nuevo animal con ID: " +  str(animal.id) + " en Protectora " + str(animal.protectora.name))
-            return model_to_dict(animal, exclude=['imagen'])
-        except:
-            return "ERROR: Error al registrar el animal"
+        if data["twitterPub"]:
+            TwitterService.postTweetNewAnimal(protectora.id, animal.id)
+
+        format, imgstr = data["imagen"].split(';base64,')
+        ext = format.split('/')[-1]
+        data = ContentFile(base64.b64decode(imgstr))  
+        file_name = animal.name + "-" + str(animal.id) +"." + ext
+        animal.imagen.save(file_name, data, save=True)
+
+        logger.info("OK: Registrado nuevo animal con ID: " +  str(animal.id) + " en Protectora " + str(animal.protectora.name))
+        return model_to_dict(animal, exclude=['imagen'])
+
     
     def deleteAnimal(id):
         try:
@@ -117,7 +119,7 @@ class AnimalService:
 
         return{"data": data}
     
-    def addFavAnimal(idUser, idAnimal):
+    def addTakeFavAnimal(idUser, idAnimal):
         AnimalService.getAnimal(idAnimal)
         usersFavs = UserFavs.objects.filter(idUsuario=idUser)
         if len(usersFavs) != 1:
@@ -125,7 +127,9 @@ class AnimalService:
         
         userFavs = usersFavs[0]
         if int(idAnimal) in userFavs.idsAnimalFav:
-            return "ERROR: Animal con id " +  idAnimal + " ya está registrado en favs para este usuario."
+            userFavs.idsAnimalFav.remove(int(idAnimal))
+            userFavs.save()
+            return "OK: Animal con id " + idAnimal + " eliminado de  la lsita de favoritos"
         
         userFavs.idsAnimalFav.append(idAnimal)
         userFavs.save()
@@ -147,6 +151,18 @@ class AnimalService:
 
         return {"data": favs}
     
+    def isAnimalFav(idUser, idAnimal):
+        AnimalService.getAnimal(idAnimal)
+        usersFavs = UserFavs.objects.filter(idUsuario=idUser)
+        if len(usersFavs) != 1:
+            return "ERROR: Favs del Usuario no encontrados"
+        
+        userFavs = usersFavs[0]
+        if int(idAnimal) in userFavs.idsAnimalFav:
+            return {"isFav" : True}
+        else:
+            return {"isFav" : False}
+
     def setAnimalEstate(idAnimal, estado):
         if estado not in ["AD", "RV", "DP"]:
             return "ERROR: Estado incorrecto"
@@ -203,17 +219,18 @@ class UserService:
 
 class TwitterService:
 
-    def postTweetNewAnimal(input):
+    def postTweetNewAnimal(idProtectora, idAnimal):
         consumer_key = "2bWZSRrbe3FJJ6e51fEinyKHf"
         consumer_secret = "KoyJzMMtrbFdKBKaLSjNBu4xHwaKDHuFG4y2YLMCspA6asQ17w"
         access_token = "1659984139863355397-FL4hX9epzEx6WoCVV82UygYtLbQxpQ"
         access_token_secret = "dyOGB3IH5coCjwJFQjBS5zkXI8ckfKlN5NSYoR7uL2YrP"
 
-        protectora = ProtectoraService.getProtectora(id=input["idProtectora"])
-        animal = AnimalService.getAnimal(id=input["idAnimal"])
+        protectora = ProtectoraService.getProtectora(id=idProtectora)
+        animal = Animal.objects.get(pk=idAnimal)
 
-        msg = "! Nuevo compañero en " + protectora["name"] + " !" + "\n" + "Nuestro nuevo amigo es un " + animal["tipo"] + ", se llama " + animal["name"] + " y tiene " + animal["edad"] + " años." + "\n"+ "\n"+ "Si estás interesado en saber más acerca de " + animal["name"] + " ponte en contacto con la protectora mediante su número de telefono: " + protectora["telefono"]+ " o escribiendo un correo a " + protectora["correo"] + "."
+        msg = "! Nuevo compañero en " + protectora["name"] + " !" + "\n" + "Nuestro nuevo amigo es un " + animal.tipo + " y se llama " + animal.name + "\n"+ "\n"+ "Si estás interesado en saber más acerca de " + animal.name + " ponte en contacto con la protectora mediante su número de telefono: " + protectora["telefono"]+ " o escribiendo un correo a " + protectora["correo"] + "."
 
+        print(msg)
         payload = {"text": msg}
 
         oauth = OAuth1Session(

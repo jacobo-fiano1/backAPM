@@ -25,6 +25,7 @@ urlpatterns = [
     path('protectora/info', UsersInfo.as_view(), name='Create Protectora'),
     path('animal/search', AnimalSearch.as_view(), name='Get Animal'),
     path('animal/fav', AnimalFavs.as_view(), name='Favs Animal'),
+    path('animal/isfav', isAnimalFav.as_view(), name='Favs Animal'),
     path('animal/state', AnimalState.as_view(), name='Favs Animal'),
     path('animal/tweet', TwitterAPI.as_view(), name='Publish tweet'),
     path('animal/<str:id>', Animal.as_view(), name='Get Animal'),

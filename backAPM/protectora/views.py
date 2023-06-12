@@ -95,8 +95,18 @@ class AnimalFavs(APIView):
     def post(self, request):
         idUser = request.GET["idUser"]
         idAnimal = request.GET["idAnimal"]
-        response = AnimalService.addFavAnimal(idUser, idAnimal)
+        response = AnimalService.addTakeFavAnimal(idUser, idAnimal)
         return JsonResponse(response, safe=False)
+    
+class isAnimalFav(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        idUser = request.GET["idUser"]
+        idAnimal = request.GET["idAnimal"]
+        favs = AnimalService.isAnimalFav(idUser, idAnimal)
+        return JsonResponse(favs, safe=False)
     
 class AnimalState(APIView):
     authentication_classes = [TokenAuthentication]
